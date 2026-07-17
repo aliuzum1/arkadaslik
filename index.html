@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arkadaşlık Uygulaması - Renkli Dünyaya Hoş Geldin</title>
+    <style>
+        /* Renkli ve Modern Arka Plan */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a18cd1 100%);
+        }
+        /* Modern Kart Tasarımı */
+        .card {
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 90%; max-width: 400px; text-align: center;
+        }
+        h1 { color: #5d3fd3; margin-bottom: 5px; }
+        .flower { font-size: 30px; }
+        .description { color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+        
+        input { 
+            display: block; width: 100%; margin: 10px 0; padding: 12px;
+            border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box;
+        }
+        button { 
+            width: 100%; padding: 12px; margin-top: 10px;
+            background: #ff6f61; color: white; border: none; border-radius: 10px;
+            font-size: 16px; cursor: pointer; transition: 0.3s;
+        }
+        button:hover { background: #ff4a3d; }
+        #message { margin-top: 15px; font-size: 14px; color: #333; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="flower">🌸 🌺 🌸</div>
+        <h1>Tanışma Zamanı!</h1>
+        <p class="description">
+            Yeni insanlarla tanışmanın, samimi sohbetler başlatmanın en renkli yolu. 
+            Hemen kayıt ol, topluluğumuza katıl!
+        </p>
+        
+        <input type="email" id="email" placeholder="📧 E-posta adresin">
+        <input type="password" id="password" placeholder="🔐 Şifren">
+        <button id="registerBtn">Hemen Aramıza Katıl!</button>
+
+        <p id="message">Kayıt olmak için bilgilerini gir ve butona bas.</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Senin Firebase yapılandırman (Aynı kalıyor)
+        const firebaseConfig = {
+          apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4",
+          authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com",
+          projectId: "arkadaslik-sitesi-6feb4",
+          storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app",
+          messagingSenderId: "510754120413",
+          appId: "1:510754120413:web:079aeb14fe20b46b22f134",
+          measurementId: "G-FB6XTD5VX0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById("registerBtn").addEventListener("click", () => {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const msg = document.getElementById("message");
+
+            msg.innerText = "Kaydediliyor... Lütfen bekle.";
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    msg.innerHTML = "🎉 <b>Tebrikler!</b> Artık aramıza katıldın!";
+                })
+                .catch((error) => {
+                    if(error.code === 'auth/email-already-in-use') {
+                        msg.innerText = "Bu e-posta zaten kayıtlı. Giriş yapmayı dene!";
+                    } else {
+                        msg.innerText = "Hata: " + error.message;
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
