@@ -9,11 +9,12 @@
         .hidden { display: none; }
         button { width: 100%; padding: 12px; margin-top: 10px; background: #5d3fd3; color: white; border: none; border-radius: 10px; cursor: pointer; }
         input, select, textarea { display: block; width: 100%; margin: 8px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .user-item { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
     </style>
 </head>
 <body>
 
-    <!-- 1. EKRAN: GİRİŞ/KAYIT -->
+    <!-- 1. GİRİŞ/KAYIT EKRANI -->
     <div class="card" id="authCard">
         <h1>Hoş Geldin!</h1>
         <input type="email" id="email" placeholder="E-posta">
@@ -21,29 +22,35 @@
         <button id="actionBtn">Giriş Yap</button>
     </div>
 
-    <!-- 2. EKRAN: ANA MENÜ -->
+    <!-- 2. ANA MENÜ -->
     <div class="card hidden" id="menuCard">
         <h1>Ana Menü</h1>
         <button onclick="showScreen('profileCard')">👤 Profilini Tamamla</button>
-        <button style="background:#ff6f61">🔍 Keşfet</button>
-        <button style="background:#ccc; color:black" onclick="location.reload()">🚪 Çıkış Yap</button>
+        <button onclick="loadUsers()">👥 Kullanıcılar</button>
+        <button style="background:#ccc; color:black" onclick="location.reload()">🚪 Çıkış</button>
     </div>
 
-    <!-- 3. EKRAN: PROFİL FORMU -->
+    <!-- 3. PROFİL DÜZENLEME -->
     <div class="card hidden" id="profileCard">
         <h1>Profilini Düzenle</h1>
         <input type="text" id="name" placeholder="Adın Soyadın">
         <input type="number" id="age" placeholder="Yaşın">
-        <select id="gender"><option value="erkek">Erkek</option><option value="kadin">Kadın</option></select>
-        <input type="text" id="city" placeholder="Yaşadığın Şehir">
+        <input type="text" id="city" placeholder="Şehir">
         <textarea id="bio" placeholder="Kendinden bahset..."></textarea>
         <button id="saveBtn">Kaydet ve Menüye Dön</button>
+    </div>
+
+    <!-- 4. KULLANICILAR EKRANI -->
+    <div class="card hidden" id="exploreCard">
+        <h1>Kullanıcılar</h1>
+        <div id="userList">Yükleniyor...</div>
+        <button style="background:#aaa" onclick="showScreen('menuCard')">Geri Dön</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4", authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com", projectId: "arkadaslik-sitesi-6feb4", storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app", messagingSenderId: "510754120413", appId: "1:510754120413:web:079aeb14fe20b46b22f134", measurementId: "G-FB6XTD5VX0" };
         const app = initializeApp(firebaseConfig);
@@ -51,33 +58,48 @@
         const db = getFirestore(app);
         let currentUserId = null;
 
-        // EKRAN YÖNETİMİ
+        // Ekranlar arası geçiş
         window.showScreen = (screenId) => {
             document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
         };
 
-        // GİRİŞ
+        // Kullanıcıları veritabanından çekme
+        window.loadUsers = async () => {
+            showScreen('exploreCard');
+            const userListDiv = document.getElementById("userList");
+            userListDiv.innerHTML = "Yükleniyor...";
+            
+            const querySnapshot = await getDocs(collection(db, "users"));
+            userListDiv.innerHTML = ""; 
+            
+            querySnapshot.forEach((doc) => {
+                const user = doc.data();
+                userListDiv.innerHTML += `
+                    <div class="user-item">
+                        <strong>${user.name}</strong> (${user.age})<br>
+                        <small>${user.city} | ${user.bio}</small>
+                    </div>`;
+            });
+        };
+
+        // Giriş
         document.getElementById("actionBtn").addEventListener("click", () => {
             signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value)
-                .then((user) => { 
-                    currentUserId = user.user.uid; 
-                    showScreen('menuCard'); 
-                })
+                .then((user) => { currentUserId = user.user.uid; showScreen('menuCard'); })
                 .catch(() => alert("Giriş başarısız!"));
         });
 
-        // PROFİL KAYDET
+        // Profil Kayıt
         document.getElementById("saveBtn").addEventListener("click", async () => {
             await setDoc(doc(db, "users", currentUserId), {
                 name: document.getElementById("name").value,
                 age: document.getElementById("age").value,
-                gender: document.getElementById("gender").value,
                 city: document.getElementById("city").value,
                 bio: document.getElementById("bio").value
             });
             alert("Profil kaydedildi!");
-            showScreen('menuCard'); // Menüye geri dön
+            showScreen('menuCard');
         });
     </script>
 </body>
