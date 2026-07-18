@@ -2,53 +2,26 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Çiçekli Bahçe - Hoş Geldin</title>
+    <title>Çiçekli Bahçe - Giriş / Kayıt</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); 
-            min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; 
-        }
-        .auth-container { 
-            background: white; padding: 40px; border-radius: 40px; 
-            box-shadow: 0 20px 40px rgba(255, 154, 158, 0.3); 
-            width: 90%; max-width: 380px; text-align: center;
-            border: 1px solid #ffe4e6;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .auth-container { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 20px 40px rgba(255, 154, 158, 0.3); width: 90%; max-width: 380px; text-align: center; border: 1px solid #ffe4e6; }
         .flower-icon { font-size: 50px; margin-bottom: 20px; }
         h1 { color: #d63384; font-weight: 300; margin-bottom: 30px; }
-        
-        .input-group { position: relative; margin-bottom: 20px; }
-        input { 
-            width: 100%; padding: 15px; border: 2px solid #f8d7da; border-radius: 25px; 
-            box-sizing: border-box; outline: none; background: #fff5f7; 
-        }
-        input:focus { border-color: #f687b3; }
-        
-        button { 
-            width: 100%; padding: 15px; background: #f687b3; color: white; border: none; 
-            border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 16px;
-            transition: 0.3s; box-shadow: 0 5px 15px rgba(246, 135, 179, 0.4);
-        }
-        button:hover { background: #d63384; transform: translateY(-2px); }
-        
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #f8d7da; border-radius: 25px; box-sizing: border-box; background: #fff5f7; outline: none; }
+        button { width: 100%; padding: 15px; background: #f687b3; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #d63384; }
         .toggle-btn { margin-top: 20px; color: #888; cursor: pointer; font-size: 14px; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- GİRİŞ VE KAYIT EKRANI -->
-    <div class="auth-container" id="authCard">
-        <div class="flower-icon">🌸</div>
-        <h1 id="authTitle">Hoş Geldin!</h1>
+    <div class="auth-container">
+        <div class="flower-icon" id="flower">🌸</div>
+        <h1 id="title">Hoş Geldin!</h1>
         
-        <div class="input-group">
-            <input type="email" id="email" placeholder="📧 E-posta adresin">
-        </div>
-        <div class="input-group">
-            <input type="password" id="password" placeholder="🔐 Şifren">
-        </div>
+        <input type="email" id="email" placeholder="📧 E-posta adresin">
+        <input type="password" id="password" placeholder="🔐 Şifren">
         
         <button id="actionBtn">Giriş Yap</button>
         
@@ -61,17 +34,38 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Firebase yapılandırman...
-        const firebaseConfig = { /* Mevcut ayarların */ };
-        // ... (Giriş mantığın)
-        
+        const firebaseConfig = { apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4", authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com", projectId: "arkadaslik-sitesi-6feb4", storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app", messagingSenderId: "510754120413", appId: "1:510754120413:web:079aeb14fe20b46b22f134", measurementId: "G-FB6XTD5VX0" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
         let isLogin = true;
+
+        // Mod Değiştirme Fonksiyonu
         window.toggleAuth = () => {
             isLogin = !isLogin;
-            document.getElementById('authTitle').innerText = isLogin ? "Hoş Geldin!" : "Aramıza Katıl!";
+            document.getElementById('title').innerText = isLogin ? "Hoş Geldin!" : "Aramıza Katıl!";
             document.getElementById('actionBtn').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
             document.getElementById('toggleText').innerHTML = isLogin ? "Henüz hesabın yok mu? <b>Kayıt Ol</b>" : "Zaten hesabın var mı? <b>Giriş Yap</b>";
+            document.getElementById('flower').innerText = isLogin ? "🌸" : "✨";
         };
+
+        // Giriş/Kayıt İşlemi
+        document.getElementById("actionBtn").addEventListener("click", () => {
+            const email = document.getElementById("email").value;
+            const pass = document.getElementById("password").value;
+
+            if (isLogin) {
+                // Giriş Yap
+                signInWithEmailAndPassword(auth, email, pass)
+                    .then(() => alert("Başarıyla giriş yaptın!"))
+                    .catch((e) => alert("Hata: " + e.message));
+            } else {
+                // Kayıt Ol
+                createUserWithEmailAndPassword(auth, email, pass)
+                    .then(() => alert("Hesabın başarıyla oluşturuldu!"))
+                    .catch((e) => alert("Hata: " + e.message));
+            }
+        });
     </script>
 </body>
 </html>
