@@ -2,69 +2,175 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Çiçekli Bahçe - Giriş / Kayıt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çiçekli Bahçe - Arkadaşlık</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
-        .auth-container { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 20px 40px rgba(255, 154, 158, 0.3); width: 90%; max-width: 380px; text-align: center; border: 1px solid #ffe4e6; }
-        .flower-icon { font-size: 50px; margin-bottom: 20px; }
-        h1 { color: #d63384; font-weight: 300; margin-bottom: 30px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #f8d7da; border-radius: 25px; box-sizing: border-box; background: #fff5f7; outline: none; }
-        button { width: 100%; padding: 15px; background: #f687b3; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #d63384; }
-        .toggle-btn { margin-top: 20px; color: #888; cursor: pointer; font-size: 14px; }
+        /* SABİT YAPI */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); 
+            min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center;
+        }
+        .card { 
+            background: white; padding: 30px; border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
+            width: 90%; max-width: 400px; text-align: center;
+            border: 2px solid white;
+        }
+        /* Zıplamayı engelleyen kesin kural */
+        .hidden { display: none !important; }
+
+        h1 { color: #8e44ad; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #eee; border-radius: 15px; }
+        button { width: 100%; padding: 14px; margin-top: 10px; background: #f687b3; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        video { width: 100%; border-radius: 15px; background: #000; margin-bottom: 10px; }
+        .user-item { background: #fff; padding: 15px; margin: 10px 0; border-radius: 15px; border-left: 5px solid #ff9a9e; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        <div class="flower-icon" id="flower">🌸</div>
-        <h1 id="title">Hoş Geldin!</h1>
-        
-        <input type="email" id="email" placeholder="📧 E-posta adresin">
-        <input type="password" id="password" placeholder="🔐 Şifren">
-        
+    <!-- 1. GİRİŞ -->
+    <div class="card" id="authCard">
+        <h1>🌸 Hoş Geldin!</h1>
+        <input type="email" id="email" placeholder="📧 E-posta">
+        <input type="password" id="password" placeholder="🔐 Şifre">
         <button id="actionBtn">Giriş Yap</button>
-        
-        <div class="toggle-btn" id="toggleText" onclick="toggleAuth()">
-            Henüz hesabın yok mu? <b>Kayıt Ol</b>
-        </div>
+        <p style="cursor:pointer; color:#888;" onclick="toggleAuth()" id="toggleText">Henüz hesabın yok mu? <b>Kayıt Ol</b></p>
+    </div>
+
+    <!-- 2. ANA MENÜ -->
+    <div class="card hidden" id="menuCard">
+        <h1>🌿 Ana Menü</h1>
+        <button onclick="showScreen('profileCard')">👤 Profilini Tamamla</button>
+        <button onclick="loadUsers()">👥 Tüm Kullanıcılar</button>
+        <button id="adminBtn" class="hidden" style="background:#f1c40f;" onclick="showScreen('adminCard')">👑 Yönetim Paneli</button>
+        <button style="background: #95a5a6;" onclick="location.reload()">🚪 Çıkış</button>
+    </div>
+
+    <!-- 3. PROFİL -->
+    <div class="card hidden" id="profileCard">
+        <h1>👤 Bilgilerin</h1>
+        <input type="text" id="name" placeholder="Adın Soyadın">
+        <input type="number" id="age" placeholder="Yaşın">
+        <button onclick="showScreen('photoCard')">İleri: Fotoğraf Çek 📸</button>
+    </div>
+
+    <!-- 4. KAMERA -->
+    <div class="card hidden" id="photoCard">
+        <h1>📸 Fotoğrafını Çek</h1>
+        <video id="video" autoplay playsinline></video>
+        <button onclick="startCamera()">Kamerayı Başlat</button>
+        <button onclick="capturePhoto()" style="background:#27ae60">Fotoğrafı Çek</button>
+        <canvas id="canvas" class="hidden"></canvas>
+        <img id="photoResult" style="width:100%; border-radius:15px; margin-top:10px;">
+        <button onclick="showScreen('prefCard')" style="background:#8e44ad">Kaydet ve İlerle</button>
+    </div>
+
+    <!-- 5. TERCİHLER -->
+    <div class="card hidden" id="prefCard">
+        <h1>✨ Ne Arıyorsun?</h1>
+        <input type="number" id="prefAge" placeholder="Aradığım yaş aralığı">
+        <input type="text" id="prefCity" placeholder="Aradığım şehir">
+        <button id="saveAllBtn" style="background:#f39c12">Tüm Profili Kaydet</button>
+    </div>
+
+    <!-- 6. KULLANICILAR -->
+    <div class="card hidden" id="exploreCard">
+        <h1>👥 Kullanıcılar</h1>
+        <div id="userList"></div>
+        <button style="background: #95a5a6;" onclick="showScreen('menuCard')">Geri Dön</button>
+    </div>
+
+    <!-- 7. YÖNETİM -->
+    <div class="card hidden" id="adminCard">
+        <h1>👑 Yönetim Paneli</h1>
+        <p>Sadece sana özel!</p>
+        <button onclick="showScreen('menuCard')">Geri Dön</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // BURAYA KENDİ UID KODUNU YAZ
+        const MY_ADMIN_UID = "BURAYA_KENDI_UID_KODUNU_YAZ";
         const firebaseConfig = { apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4", authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com", projectId: "arkadaslik-sitesi-6feb4", storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app", messagingSenderId: "510754120413", appId: "1:510754120413:web:079aeb14fe20b46b22f134", measurementId: "G-FB6XTD5VX0" };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
+        const db = getFirestore(app);
+        let currentUserId = null;
         let isLogin = true;
+        let photoData = null;
 
-        // Mod Değiştirme Fonksiyonu
-        window.toggleAuth = () => {
-            isLogin = !isLogin;
-            document.getElementById('title').innerText = isLogin ? "Hoş Geldin!" : "Aramıza Katıl!";
-            document.getElementById('actionBtn').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
-            document.getElementById('toggleText').innerHTML = isLogin ? "Henüz hesabın yok mu? <b>Kayıt Ol</b>" : "Zaten hesabın var mı? <b>Giriş Yap</b>";
-            document.getElementById('flower').innerText = isLogin ? "🌸" : "✨";
+        // Sayfa Gösterim Yönetimi
+        window.showScreen = (id) => {
+            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         };
 
-        // Giriş/Kayıt İşlemi
+        // Oturum Kontrolü (Sayfa yenilense bile giriş kalıcı olur)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                if(currentUserId === MY_ADMIN_UID) document.getElementById("adminBtn").classList.remove("hidden");
+                showScreen('menuCard');
+            }
+        });
+
+        window.toggleAuth = () => {
+            isLogin = !isLogin;
+            document.getElementById('actionBtn').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
+            document.getElementById('toggleText').innerHTML = isLogin ? "Henüz hesabın yok mu? <b>Kayıt Ol</b>" : "Zaten hesabın var mı? <b>Giriş Yap</b>";
+        };
+
+        window.startCamera = async () => { 
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true }); 
+                document.getElementById('video').srcObject = stream; 
+            } catch(e) { alert("Kamera izni verilmedi!"); }
+        };
+
+        window.capturePhoto = () => {
+            const video = document.getElementById('video'); const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            photoData = canvas.toDataURL('image/png');
+            document.getElementById('photoResult').src = photoData;
+        };
+
+        window.loadUsers = async () => {
+            showScreen('exploreCard');
+            const list = document.getElementById("userList"); list.innerHTML = "Çiçekler açılıyor... 🌸";
+            const snap = await getDocs(collection(db, "users"));
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                list.innerHTML += `<div class="user-item"><strong>${u.name}</strong> (${u.age})<br><small>📍 ${u.city}</small></div>`;
+            });
+        };
+
         document.getElementById("actionBtn").addEventListener("click", () => {
             const email = document.getElementById("email").value;
             const pass = document.getElementById("password").value;
+            const func = isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword;
+            func(auth, email, pass).catch(e => alert(e.message));
+        });
 
-            if (isLogin) {
-                // Giriş Yap
-                signInWithEmailAndPassword(auth, email, pass)
-                    .then(() => alert("Başarıyla giriş yaptın!"))
-                    .catch((e) => alert("Hata: " + e.message));
-            } else {
-                // Kayıt Ol
-                createUserWithEmailAndPassword(auth, email, pass)
-                    .then(() => alert("Hesabın başarıyla oluşturuldu!"))
-                    .catch((e) => alert("Hata: " + e.message));
-            }
+        document.getElementById("saveAllBtn").addEventListener("click", async () => {
+            if(!photoData) return alert("Lütfen fotoğraf çek!");
+            await setDoc(doc(db, "users", currentUserId), {
+                name: document.getElementById("name").value,
+                age: document.getElementById("age").value,
+                city: document.getElementById("prefCity").value, // Şehir bilgisi
+                photo: photoData,
+                prefAge: document.getElementById("prefAge").value,
+                prefCity: document.getElementById("prefCity").value
+            });
+            alert("Her şey kaydedildi!");
+            showScreen('menuCard');
         });
     </script>
 </body>
