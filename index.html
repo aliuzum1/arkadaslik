@@ -2,26 +2,31 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <title>Global Sosyal Ağ | Giriş & Kayıt</title>
     <link rel="stylesheet" href="css/style.css">
-    <title>Global Command Center | Login</title>
 </head>
 <body>
-    <div class="glow-bg"></div>
-    <div class="login-panel">
+    <div class="auth-card">
         <div class="brand">
-            <h1>GLOBAL COMMAND CENTER</h1>
-            <p>Sistem Operasyonel: 700/700 Hazır</p>
+            <h1>GLOBAL NETWORK</h1>
+            <p>İlişki & İnovasyon Ağı</p>
         </div>
-        
-        <div class="input-group">
-            <input type="text" id="username" placeholder="OPERATÖR KİMLİĞİ" required>
-            <input type="password" id="password" placeholder="ERİŞİM ANAHTARI" required>
+
+        <!-- Giriş Formu -->
+        <div id="login-form">
+            <input type="text" placeholder="Operatör Kimliği">
+            <input type="password" placeholder="Erişim Anahtarı">
+            <button onclick="login()">SİSTEME BAĞLAN</button>
+            <p>Henüz hesabın yok mu? <a href="#" onclick="toggleAuth()">Hemen Kayıt Ol</a></p>
         </div>
-        
-        <button onclick="login()" class="login-btn">SİSTEME BAĞLAN</button>
-        
-        <div class="status-bar">
-            <span>Bağlantı: Şifreli (AES-256)</span>
+
+        <!-- Kayıt Formu (Başlangıçta gizli) -->
+        <div id="register-form" style="display:none;">
+            <input type="text" placeholder="Adın ve Soyadın">
+            <input type="email" placeholder="E-posta Adresi">
+            <input type="password" placeholder="Şifre Oluştur">
+            <button onclick="register()">KAYIT TAMAMLA</button>
+            <p>Zaten üye misin? <a href="#" onclick="toggleAuth()">Giriş Yap</a></p>
         </div>
     </div>
     <script src="js/auth.js"></script>
