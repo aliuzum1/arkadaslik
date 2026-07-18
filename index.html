@@ -3,71 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Çiçekli Bahçe</title>
+    <title>Sistem Girişi</title>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
-        .card { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 90%; max-width: 400px; text-align: center; border: 2px solid white; }
-        .hidden { display: none !important; }
-        h1 { color: #8e44ad; }
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #eee; border-radius: 15px; }
-        button { width: 100%; padding: 14px; margin-top: 10px; background: #f687b3; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        body { background-color: #000; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background-color: #1a1a1a; border: 1px solid #444; padding: 40px; width: 90%; max-width: 400px; text-align: center; }
+        h1 { font-size: 1.2rem; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #666; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 15px; background: #fff; color: #000; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #ccc; }
     </style>
 </head>
 <body>
 
-    <!-- 1. GİRİŞ -->
     <div class="card" id="authCard">
-        <h1>🌸 Hoş Geldin!</h1>
-        <input type="email" id="email" placeholder="📧 E-posta">
-        <input type="password" id="password" placeholder="🔐 Şifre">
-        <button id="actionBtn">Giriş Yap</button>
-    </div>
-
-    <!-- 2. ANA MENÜ -->
-    <div class="card hidden" id="menuCard">
-        <h1>🌿 Ana Menü</h1>
-        <p>Giriş başarılı, menüdesin!</p>
-        <button onclick="location.reload()">Çıkış Yap</button>
+        <h1>SİSTEM GİRİŞİ</h1>
+        <input type="email" id="email" placeholder="E-posta">
+        <input type="password" id="password" placeholder="Şifre">
+        <button id="loginBtn">GİRİŞ YAP</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4", authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com", projectId: "arkadaslik-sitesi-6feb4", storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app", messagingSenderId: "510754120413", appId: "1:510754120413:web:079aeb14fe20b46b22f134", measurementId: "G-FB6XTD5VX0" };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Firebase giriş durumunu izliyor
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                alert("1. Adım: Firebase girişi algıladı!");
-                
-                const menu = document.getElementById("menuCard");
-                if (menu) {
-                    alert("2. Adım: menuCard bulundu, gizlilik kaldırılıyor.");
-                    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-                    menu.classList.remove('hidden');
-                    alert("3. Adım: Menü ekrana getirildi.");
-                } else {
-                    alert("HATA: menuCard bulunamadı!");
-                }
-            } else {
-                alert("Oturum açık değil, giriş ekranındasın.");
-                document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-                document.getElementById('authCard').classList.remove('hidden');
-            }
-        });
-
-        // Giriş Butonu
-        document.getElementById("actionBtn").addEventListener("click", () => {
+        document.getElementById("loginBtn").addEventListener("click", () => {
             const email = document.getElementById("email").value;
             const pass = document.getElementById("password").value;
+            
             signInWithEmailAndPassword(auth, email, pass)
-                .then(() => alert("Giriş isteği gönderildi..."))
-                .catch(e => alert("Hata: " + e.message));
+                .then(() => {
+                    alert("Giriş Başarılı! 1. Sayfa Tamamlandı.");
+                })
+                .catch(e => {
+                    alert("Hata: " + e.message);
+                });
         });
     </script>
 </body>
