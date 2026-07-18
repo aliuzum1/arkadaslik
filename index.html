@@ -2,105 +2,76 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Arkadaşlık Uygulaması</title>
+    <title>Çiçekli Bahçe - Hoş Geldin</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #ff9a9e, #fad0c4, #a18cd1); min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); 
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; 
+        }
+        .auth-container { 
+            background: white; padding: 40px; border-radius: 40px; 
+            box-shadow: 0 20px 40px rgba(255, 154, 158, 0.3); 
+            width: 90%; max-width: 380px; text-align: center;
+            border: 1px solid #ffe4e6;
+        }
+        .flower-icon { font-size: 50px; margin-bottom: 20px; }
+        h1 { color: #d63384; font-weight: 300; margin-bottom: 30px; }
+        
+        .input-group { position: relative; margin-bottom: 20px; }
+        input { 
+            width: 100%; padding: 15px; border: 2px solid #f8d7da; border-radius: 25px; 
+            box-sizing: border-box; outline: none; background: #fff5f7; 
+        }
+        input:focus { border-color: #f687b3; }
+        
+        button { 
+            width: 100%; padding: 15px; background: #f687b3; color: white; border: none; 
+            border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 16px;
+            transition: 0.3s; box-shadow: 0 5px 15px rgba(246, 135, 179, 0.4);
+        }
+        button:hover { background: #d63384; transform: translateY(-2px); }
+        
+        .toggle-btn { margin-top: 20px; color: #888; cursor: pointer; font-size: 14px; }
         .hidden { display: none; }
-        button { width: 100%; padding: 12px; margin-top: 10px; background: #5d3fd3; color: white; border: none; border-radius: 10px; cursor: pointer; }
-        input, select, textarea { display: block; width: 100%; margin: 8px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .user-item { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
     </style>
 </head>
 <body>
 
-    <!-- 1. GİRİŞ/KAYIT EKRANI -->
-    <div class="card" id="authCard">
-        <h1>Hoş Geldin!</h1>
-        <input type="email" id="email" placeholder="E-posta">
-        <input type="password" id="password" placeholder="Şifre">
+    <!-- GİRİŞ VE KAYIT EKRANI -->
+    <div class="auth-container" id="authCard">
+        <div class="flower-icon">🌸</div>
+        <h1 id="authTitle">Hoş Geldin!</h1>
+        
+        <div class="input-group">
+            <input type="email" id="email" placeholder="📧 E-posta adresin">
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="🔐 Şifren">
+        </div>
+        
         <button id="actionBtn">Giriş Yap</button>
-    </div>
-
-    <!-- 2. ANA MENÜ -->
-    <div class="card hidden" id="menuCard">
-        <h1>Ana Menü</h1>
-        <button onclick="showScreen('profileCard')">👤 Profilini Tamamla</button>
-        <button onclick="loadUsers()">👥 Kullanıcılar</button>
-        <button style="background:#ccc; color:black" onclick="location.reload()">🚪 Çıkış</button>
-    </div>
-
-    <!-- 3. PROFİL DÜZENLEME -->
-    <div class="card hidden" id="profileCard">
-        <h1>Profilini Düzenle</h1>
-        <input type="text" id="name" placeholder="Adın Soyadın">
-        <input type="number" id="age" placeholder="Yaşın">
-        <input type="text" id="city" placeholder="Şehir">
-        <textarea id="bio" placeholder="Kendinden bahset..."></textarea>
-        <button id="saveBtn">Kaydet ve Menüye Dön</button>
-    </div>
-
-    <!-- 4. KULLANICILAR EKRANI -->
-    <div class="card hidden" id="exploreCard">
-        <h1>Kullanıcılar</h1>
-        <div id="userList">Yükleniyor...</div>
-        <button style="background:#aaa" onclick="showScreen('menuCard')">Geri Dön</button>
+        
+        <div class="toggle-btn" id="toggleText" onclick="toggleAuth()">
+            Henüz hesabın yok mu? <b>Kayıt Ol</b>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4", authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com", projectId: "arkadaslik-sitesi-6feb4", storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app", messagingSenderId: "510754120413", appId: "1:510754120413:web:079aeb14fe20b46b22f134", measurementId: "G-FB6XTD5VX0" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let currentUserId = null;
-
-        // Ekranlar arası geçiş
-        window.showScreen = (screenId) => {
-            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
+        // Firebase yapılandırman...
+        const firebaseConfig = { /* Mevcut ayarların */ };
+        // ... (Giriş mantığın)
+        
+        let isLogin = true;
+        window.toggleAuth = () => {
+            isLogin = !isLogin;
+            document.getElementById('authTitle').innerText = isLogin ? "Hoş Geldin!" : "Aramıza Katıl!";
+            document.getElementById('actionBtn').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
+            document.getElementById('toggleText').innerHTML = isLogin ? "Henüz hesabın yok mu? <b>Kayıt Ol</b>" : "Zaten hesabın var mı? <b>Giriş Yap</b>";
         };
-
-        // Kullanıcıları veritabanından çekme
-        window.loadUsers = async () => {
-            showScreen('exploreCard');
-            const userListDiv = document.getElementById("userList");
-            userListDiv.innerHTML = "Yükleniyor...";
-            
-            const querySnapshot = await getDocs(collection(db, "users"));
-            userListDiv.innerHTML = ""; 
-            
-            querySnapshot.forEach((doc) => {
-                const user = doc.data();
-                userListDiv.innerHTML += `
-                    <div class="user-item">
-                        <strong>${user.name}</strong> (${user.age})<br>
-                        <small>${user.city} | ${user.bio}</small>
-                    </div>`;
-            });
-        };
-
-        // Giriş
-        document.getElementById("actionBtn").addEventListener("click", () => {
-            signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value)
-                .then((user) => { currentUserId = user.user.uid; showScreen('menuCard'); })
-                .catch(() => alert("Giriş başarısız!"));
-        });
-
-        // Profil Kayıt
-        document.getElementById("saveBtn").addEventListener("click", async () => {
-            await setDoc(doc(db, "users", currentUserId), {
-                name: document.getElementById("name").value,
-                age: document.getElementById("age").value,
-                city: document.getElementById("city").value,
-                bio: document.getElementById("bio").value
-            });
-            alert("Profil kaydedildi!");
-            showScreen('menuCard');
-        });
     </script>
 </body>
 </html>
