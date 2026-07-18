@@ -2,47 +2,114 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Girişi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sabit Panel</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background-color: #1a1a1a; border: 1px solid #444; padding: 40px; width: 90%; max-width: 400px; text-align: center; }
-        h1 { font-size: 1.2rem; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #666; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 15px; background: #fff; color: #000; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: #ccc; }
+        /* TAM EKRAN KİLİT */
+        body { 
+            background-color: #0d0d0d; 
+            color: #e0e0e0; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            height: 100vh; 
+            overflow: hidden; /* Sayfanın komple kaymasını engeller */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        .container { 
+            width: 95%; 
+            max-width: 450px; 
+            height: 90vh; /* Ekranın dışına taşmasın */
+            display: flex; 
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card { 
+            background-color: #1a1a1a; 
+            border: 1px solid #333; 
+            padding: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            text-align: center;
+            overflow: hidden; /* Kartın dışına taşmayı engeller */
+        }
+        
+        /* SADECE MENÜ KUTUSU İÇİ KAYDIRILABİLİR */
+        #menuPage { 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 80vh; 
+        }
+        #menuList { 
+            overflow-y: auto; /* Liste uzunsa sadece burası kayar */
+            flex-grow: 1;
+            margin: 10px 0;
+            border-top: 1px solid #333;
+        }
+
+        .hidden { display: none !important; }
+        
+        h1 { font-size: 1.2rem; color: #fff; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #555; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 10px; background: #222; color: #fff; border: 1px solid #777; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        
+        .menu-item { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="card" id="authCard">
-        <h1>SİSTEM GİRİŞİ</h1>
-        <input type="email" id="email" placeholder="E-posta">
-        <input type="password" id="password" placeholder="Şifre">
-        <button id="loginBtn">GİRİŞ YAP</button>
+    <div class="container">
+        <!-- GİRİŞ -->
+        <div class="card" id="authPage">
+            <h1>SİSTEM GİRİŞİ</h1>
+            <input type="email" id="email" placeholder="E-posta">
+            <input type="password" id="password" placeholder="Şifre">
+            <button id="authBtn">GİRİŞ YAP</button>
+        </div>
+
+        <!-- MENÜ -->
+        <div class="card hidden" id="menuPage">
+            <h1>YÖNETİM PANELİ</h1>
+            <div id="menuList"></div>
+            <button id="logoutBtn" style="background: #400;">OTURUMU KAPAT</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDsWZcvZ0iam3VgKE2PUuFpHTkFCXRNMr4", authDomain: "arkadaslik-sitesi-6feb4.firebaseapp.com", projectId: "arkadaslik-sitesi-6feb4", storageBucket: "arkadaslik-sitesi-6feb4.firebasestorage.app", messagingSenderId: "510754120413", appId: "1:510754120413:web:079aeb14fe20b46b22f134", measurementId: "G-FB6XTD5VX0" };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        document.getElementById("loginBtn").addEventListener("click", () => {
+        const menuItems = ["Kurumsal Bilgiler", "Hizmet Dökümü", "Kullanıcı Profili", "Ayarlar", "Güvenlik Raporu", "Dosya Yönetimi", "Bildirimler", "Erişim Logları", "Destek Talebi", "İletişim", "Yedekleme", "Yetkilendirme", "Sistem Durumu", "Analizler", "Çıkış Yap"];
+        const menuListDiv = document.getElementById("menuList");
+        menuItems.forEach(item => menuListDiv.innerHTML += `<div class="menu-item">▶ ${item}</div>`);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('authPage').classList.add('hidden');
+                document.getElementById('menuPage').classList.remove('hidden');
+            } else {
+                document.getElementById('authPage').classList.remove('hidden');
+                document.getElementById('menuPage').classList.add('hidden');
+            }
+        });
+
+        document.getElementById("authBtn").addEventListener("click", () => {
             const email = document.getElementById("email").value;
             const pass = document.getElementById("password").value;
-            
-            signInWithEmailAndPassword(auth, email, pass)
-                .then(() => {
-                    alert("Giriş Başarılı! 1. Sayfa Tamamlandı.");
-                })
-                .catch(e => {
-                    alert("Hata: " + e.message);
-                });
+            createUserWithEmailAndPassword(auth, email, pass).catch(e => {
+                if(e.code === 'auth/email-already-in-use') signInWithEmailAndPassword(auth, email, pass);
+                else alert("Hata: " + e.message);
+            });
         });
+
+        document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
     </script>
 </body>
 </html>
