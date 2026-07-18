@@ -3,73 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sabit Panel</title>
+    <title>Resmi Portalı</title>
     <style>
-        /* TAM EKRAN KİLİT */
-        body { 
-            background-color: #0d0d0d; 
-            color: #e0e0e0; 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 0; 
-            height: 100vh; 
-            overflow: hidden; /* Sayfanın komple kaymasını engeller */
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-        }
-        
-        .container { 
-            width: 95%; 
-            max-width: 450px; 
-            height: 90vh; /* Ekranın dışına taşmasın */
-            display: flex; 
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .card { 
-            background-color: #1a1a1a; 
-            border: 1px solid #333; 
-            padding: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
-            text-align: center;
-            overflow: hidden; /* Kartın dışına taşmayı engeller */
-        }
-        
-        /* SADECE MENÜ KUTUSU İÇİ KAYDIRILABİLİR */
-        #menuPage { 
-            display: flex; 
-            flex-direction: column; 
-            max-height: 80vh; 
-        }
-        #menuList { 
-            overflow-y: auto; /* Liste uzunsa sadece burası kayar */
-            flex-grow: 1;
-            margin: 10px 0;
-            border-top: 1px solid #333;
-        }
-
+        body { background-color: #0d0d0d; color: #e0e0e0; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .container { width: 95%; max-width: 400px; height: 90vh; display: flex; flex-direction: column; justify-content: center; }
+        .card { background-color: #1a1a1a; border: 1px solid #333; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
         .hidden { display: none !important; }
         
-        h1 { font-size: 1.2rem; color: #fff; margin-bottom: 15px; }
+        h1 { font-size: 1.2rem; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
         input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #555; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 10px; background: #222; color: #fff; border: 1px solid #777; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        button { width: 100%; padding: 14px; margin-top: 10px; background: #222; color: #fff; border: 1px solid #777; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        button:hover { background: #333; }
         
-        .menu-item { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
+        /* Menü Listesi */
+        #menuPage { display: flex; flex-direction: column; max-height: 80vh; }
+        #menuList { overflow-y: auto; flex-grow: 1; margin: 10px 0; border-top: 1px solid #333; text-align: left; }
+        .menu-item { padding: 12px; border-bottom: 1px solid #333; cursor: pointer; }
+        .menu-item:hover { background: #222; }
+        
+        #toggleMode { cursor: pointer; color: #aaa; font-size: 0.8rem; margin-top: 15px; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- GİRİŞ -->
+        <!-- 1. GİRİŞ VE KAYIT EKRANI -->
         <div class="card" id="authPage">
-            <h1>SİSTEM GİRİŞİ</h1>
-            <input type="email" id="email" placeholder="E-posta">
+            <h1 id="formTitle">GİRİŞ YAP</h1>
+            <input type="email" id="email" placeholder="E-posta Adresi">
             <input type="password" id="password" placeholder="Şifre">
-            <button id="authBtn">GİRİŞ YAP</button>
+            <button id="mainBtn">GİRİŞ YAP</button>
+            <p id="toggleMode">Henüz hesabın yok mu? Kayıt Ol</p>
         </div>
 
-        <!-- MENÜ -->
+        <!-- 2. MENÜ EKRANI -->
         <div class="card hidden" id="menuPage">
             <h1>YÖNETİM PANELİ</h1>
             <div id="menuList"></div>
@@ -86,10 +53,35 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // Mod Değişkeni (true = Giriş, false = Kayıt)
+        let isLoginMode = true;
+
+        // Menü maddeleri
         const menuItems = ["Kurumsal Bilgiler", "Hizmet Dökümü", "Kullanıcı Profili", "Ayarlar", "Güvenlik Raporu", "Dosya Yönetimi", "Bildirimler", "Erişim Logları", "Destek Talebi", "İletişim", "Yedekleme", "Yetkilendirme", "Sistem Durumu", "Analizler", "Çıkış Yap"];
         const menuListDiv = document.getElementById("menuList");
         menuItems.forEach(item => menuListDiv.innerHTML += `<div class="menu-item">▶ ${item}</div>`);
 
+        // Mod Değiştirme (Giriş <-> Kayıt)
+        document.getElementById("toggleMode").addEventListener("click", () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById("formTitle").innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL";
+            document.getElementById("mainBtn").innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL";
+            document.getElementById("toggleMode").innerText = isLoginMode ? "Henüz hesabın yok mu? Kayıt Ol" : "Zaten hesabın var mı? Giriş Yap";
+        });
+
+        // Buton Aksiyonu
+        document.getElementById("mainBtn").addEventListener("click", () => {
+            const email = document.getElementById("email").value;
+            const pass = document.getElementById("password").value;
+
+            if (isLoginMode) {
+                signInWithEmailAndPassword(auth, email, pass).catch(e => alert("Giriş Hatası: " + e.message));
+            } else {
+                createUserWithEmailAndPassword(auth, email, pass).catch(e => alert("Kayıt Hatası: " + e.message));
+            }
+        });
+
+        // Oturum Kontrolü
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('authPage').classList.add('hidden');
@@ -100,15 +92,7 @@
             }
         });
 
-        document.getElementById("authBtn").addEventListener("click", () => {
-            const email = document.getElementById("email").value;
-            const pass = document.getElementById("password").value;
-            createUserWithEmailAndPassword(auth, email, pass).catch(e => {
-                if(e.code === 'auth/email-already-in-use') signInWithEmailAndPassword(auth, email, pass);
-                else alert("Hata: " + e.message);
-            });
-        });
-
+        // Çıkış
         document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
     </script>
 </body>
