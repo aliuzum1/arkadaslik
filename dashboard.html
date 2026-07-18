@@ -1,26 +1,21 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Komuta Merkezi</title>
+    <title>Global Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Burası senin 700 maddeyi yöneteceğin ana alan -->
-    <nav class="top-bar">
-        <span>GLOBAL OPERASYONEL PANEL</span>
-        <button onclick="logout()">Çıkış Yap</button>
-    </nav>
-    
-    <div class="main-grid" id="modules-container">
-        <!-- Modüller buraya yüklenecek -->
-        <h2>Sistem Aktif (700/700 Hazır)</h2>
+    <div class="auth-container" style="text-align: center; padding-top: 50px;">
+        <h1>SYSTEM ACTIVE</h1>
+        <p>Dashboard is currently empty. Waiting for module deployment.</p>
+        
+        <!-- Çıkış Yap Butonu -->
+        <button onclick="handleLogout()" style="background: #333; color: #fff; margin-top: 20px;">
+            LOG OUT
+        </button>
     </div>
 
     <script src="js/auth.js"></script>
-    <script>
-        // Sayfa açıldığında giriş yapılmış mı kontrol et
-        checkAuth(); 
-    </script>
 </body>
 </html>
