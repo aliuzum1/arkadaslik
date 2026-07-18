@@ -2,33 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Global Network | Authentication</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Hub | System Access</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
     <div class="auth-container">
-        <!-- Login Form -->
-        <div id="login-form" class="auth-box">
+        
+        <!-- GİRİŞ FORMU -->
+        <div id="login-box" class="form-box">
             <h1>AUTHENTICATE</h1>
-            <p>Access your global account</p>
-            <input type="text" placeholder="Username / Email">
-            <input type="password" placeholder="Password">
-            <button onclick="handleLogin()">LOGIN</button>
-            <p class="switch">New here? <span onclick="toggleForm()">Create Account</span></p>
+            <p>Access your user profile</p>
+            <input type="text" id="log-user" placeholder="Username">
+            <input type="password" id="log-pass" placeholder="Password">
+            <button onclick="executeLogin()">LOGIN</button>
+            <p class="toggle-text">New entry? <span onclick="toggleView()">Create an account</span></p>
         </div>
 
-        <!-- Register Form -->
-        <div id="register-form" class="auth-box" style="display:none;">
-            <h1>JOIN NETWORK</h1>
-            <p>Become a part of the ecosystem</p>
-            <input type="text" placeholder="Full Name">
-            <input type="email" placeholder="Email Address">
-            <input type="password" placeholder="Create Password">
-            <button onclick="handleRegister()">SIGN UP</button>
-            <p class="switch">Already a member? <span onclick="toggleForm()">Login</span></p>
+        <!-- KAYIT FORMU -->
+        <div id="register-box" class="form-box" style="display:none;">
+            <h1>JOIN SYSTEM</h1>
+            <p>Become part of the platform</p>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="email" id="reg-email" placeholder="Email Address">
+            <input type="password" id="reg-pass" placeholder="Create Password">
+            <button onclick="executeRegister()">SIGN UP</button>
+            <p class="toggle-text">Already a member? <span onclick="toggleView()">Login</span></p>
         </div>
+
     </div>
-    <script src="js/ui.js"></script>
+
     <script src="js/auth.js"></script>
 </body>
 </html>
