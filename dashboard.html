@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Komuta Merkezi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Burası senin 700 maddeyi yöneteceğin ana alan -->
+    <nav class="top-bar">
+        <span>GLOBAL OPERASYONEL PANEL</span>
+        <button onclick="logout()">Çıkış Yap</button>
+    </nav>
+    
+    <div class="main-grid" id="modules-container">
+        <!-- Modüller buraya yüklenecek -->
+        <h2>Sistem Aktif (700/700 Hazır)</h2>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Sayfa açıldığında giriş yapılmış mı kontrol et
+        checkAuth(); 
+    </script>
+</body>
+</html>
